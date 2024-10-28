@@ -9,8 +9,8 @@ class FolderStructureLocal(FolderStructure):
 
     def __init__(self, config_file_path:str | Path = None):
 
-        config_file_path = Path(config_file_path) if config_file_path is not None else Path("config/config.yaml")
-        FolderStructure.__init__(self, config_file_path)
+        config_file_path:Path = Path(config_file_path) if config_file_path is not None else Path("config/config.yaml")
+        super().__init__(config_file_path)
 
         config_file_stream = self.load(Path(self.config_file_path))
         self.config: dict = self.read_yaml(config_file_stream)["execution_environment"]["local"]
