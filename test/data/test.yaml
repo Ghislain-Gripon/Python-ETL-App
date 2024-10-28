@@ -19,5 +19,5 @@ execution_environment:
                       config: config
                       flows: flows
                   files:
-                      logger_config: logger_config.yaml
-                      flows: flows.yaml
+                      logger_config_path: logger_config.yaml
+                      flows_path: flows.yaml

@@ -1,8 +1,8 @@
 class FolderStructure:
 
-    def __init__(self, config_file_path = None, config = None):
+    def __init__(self, config_file_path = None):
         self.config_file_path = config_file_path
-        self.config = config
+        self.config:dict = dict()
 
     def move(self, source: str, target: str):
         pass
