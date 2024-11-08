@@ -14,6 +14,13 @@ execution_environment:
                       directories:
                             - error
                             - done
+                  file_type:
+                    - type: clinical_trials
+                      file_regex: "^clinial_trials[.](?P<ext>csv|json)$"
+                    - type: drugs
+                      file_regex: "^drugs[.](?P<ext>csv|json)$"
+                    - type: pubmed
+                      file_regex: "^pubmed[.](?P<ext>csv|json)$"
               config:
                   directories:
                       config: config

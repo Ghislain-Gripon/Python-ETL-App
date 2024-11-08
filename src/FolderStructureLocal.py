@@ -1,5 +1,8 @@
 import logging
 import logging.config
+import pandas as pd
+
+from pandas import DataFrame
 from src.FolderStructure import FolderStructure
 from pathlib import Path
 from src.Decorators import debug
@@ -73,3 +76,8 @@ class FolderStructureLocal(FolderStructure):
     @debug
     def get_config(self, ) -> dict:
         return self.config
+
+    @debug
+    def write(self, df:DataFrame, file_path:Path | str) -> Path | str:
+        df.to_csv(file_path, index=False, mode="a")
+        return Path(file_path)

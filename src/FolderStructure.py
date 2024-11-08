@@ -1,3 +1,8 @@
+from pathlib import Path
+
+from pandas import DataFrame
+
+
 class FolderStructure:
 
     def __init__(self, config_file_path = None):
@@ -16,5 +21,13 @@ class FolderStructure:
     def get_config(self, ) -> dict:
         """
         Returns the configuration dictionary.
+        """
+        pass
+
+    def write(self, df:DataFrame, file_path:Path | str) -> Path | str:
+        """
+        :param df: data to write
+        :param file_path: string, Path, local or cloud location
+        :return:
         """
         pass
