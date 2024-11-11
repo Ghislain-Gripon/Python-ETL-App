@@ -9,8 +9,8 @@ class Workflow:
 
     @debug
     def __init__(self, _file_handler:FolderStructure):
-        self.FileHandler:FolderStructure = _file_handler
-        self.config: dict = self.FileHandler.get_config()
+        self.file_handler:FolderStructure = _file_handler
+        self.config: dict = self.file_handler.get_config()
         self.data_loaders:dict = dict()
         self.run_flow()
 

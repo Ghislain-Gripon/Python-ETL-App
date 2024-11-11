@@ -1,6 +1,6 @@
 import logging
 import logging.config
-import pandas as pd
+import re
 
 from pandas import DataFrame
 from src.FolderStructure import FolderStructure
@@ -23,6 +23,16 @@ class FolderStructureLocal(FolderStructure):
                                          self.config["data_directory_path"]["config"]["files"]["logger_config"])
         logging.config.dictConfig(self.read_yaml(logger_config_stream))
         logger_config_stream.close()
+
+        for io_direction in ["input", "output"]:
+            for directory_name in self.config["data_directory_path"]["data"][io_direction]["directories"]:
+                full_directory: Path = (Path(self.config["data_directory_path"]["base_path"])
+                / self.config["data_directory_path"]["data"][io_direction]["base_path"]
+                / directory_name
+                )
+                full_directory.mkdir(parents=True, exist_ok=True)
+                self.file_directories[directory_name] = full_directory
+
 
     @debug
     def move(self, source: str | Path, target: str | Path) -> Path:
@@ -72,6 +82,10 @@ class FolderStructureLocal(FolderStructure):
             raise "File reading error."
 
         return _file
+
+    @debug
+    def get_file_list(self, regex:str) -> list[Path]:
+        return [file for file in self.file_directories["inbound"].iterdir() if re.search(regex, file.name) is not None]
 
     @debug
     def get_config(self, ) -> dict:

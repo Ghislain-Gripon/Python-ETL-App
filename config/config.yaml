@@ -2,7 +2,7 @@ execution_environment:
    local:
           data_origin: 'csv'
           data_directory_path:
-              base_path: data
+              base_path: ../data
               data:
                   input:
                       base_path: input

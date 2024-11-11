@@ -1,9 +1,10 @@
 import pandas as pd
 from pandas import DataFrame
 
+from src.DataCleaner import DataCleaner
 from src.Decorators import debug
 
-class DataCleanerImpl:
+class DataCleanerImpl(DataCleaner):
 
     @debug
     def clean(self, df:DataFrame) -> DataFrame:
