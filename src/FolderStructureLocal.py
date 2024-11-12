@@ -2,6 +2,8 @@ import logging
 import logging.config
 import re
 
+from typing import TextIO
+
 from pandas import DataFrame
 from src.FolderStructure import FolderStructure
 from pathlib import Path
@@ -10,9 +12,9 @@ from yaml import safe_load
 
 class FolderStructureLocal(FolderStructure):
 
-    def __init__(self, config_file_path:str | Path = None):
+    def __init__(self, _config_file_path:str | Path = None):
 
-        config_file_path:Path = Path(config_file_path) if config_file_path is not None else Path("config/config.yaml")
+        config_file_path:Path = Path(_config_file_path) if _config_file_path is not None else Path("config/config.yaml")
         super().__init__(config_file_path)
 
         config_file_stream = self.load(Path(self.config_file_path))
@@ -45,16 +47,13 @@ class FolderStructureLocal(FolderStructure):
         return source.rename(target)
 
     @debug
-    def load(self, file_path: str | Path):
-        _file = None
+    def load(self, file_path: str | Path) -> TextIO:
         path: Path = Path(file_path)
         if Path.is_file(path):
-            _file = open(str(path), 'r')
+            return open(path, 'r')
         else:
-            logging.warning("No file located at {}".format(file_path))
-            raise FileNotFoundError("There is no file at {}".format(path))
-
-        return _file
+            logging.error(f"No file located at {file_path}")
+            raise FileNotFoundError(f"There is no file at {path}")
 
     @debug
     def read_yaml(self, file_stream) -> dict:
@@ -66,7 +65,6 @@ class FolderStructureLocal(FolderStructure):
 
         try:
             _file: dict = safe_load(file_stream)
-            logging.info("YAML configuration file successfully read.")
 
         # catch a yaml related error to inform user of problem with config file
         except FileNotFoundError:

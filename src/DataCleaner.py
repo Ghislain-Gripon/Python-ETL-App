@@ -3,7 +3,7 @@ from pandas import DataFrame
 
 class DataCleaner:
 
-    def clean(self, df:DataFrame) -> DataFrame:
+    def clean_duplicates(self, df:DataFrame) -> DataFrame:
         pass
 
     def format(self, df:DataFrame, column_format:dict | None = None) -> DataFrame:
