@@ -13,7 +13,7 @@ from src.Graph import Graph
 from src.GraphDrugs import GraphDrugs
 from src.Workflow import Workflow
 
-class WorkflowImp(Workflow):
+class WorkflowImpl(Workflow):
 
     @debug
     def run_flow(self, ):
@@ -22,6 +22,7 @@ class WorkflowImp(Workflow):
 
         file_types:list[dict] = self.config["data_directory_path"]["data"]["file_type"]
         data_files:dict[str, list[dict[str, Path | str]]] = self._get_files_by_type(file_types)
+
         input_data:dict[str, DataFrame] = self._build_data_frames(data_files)
 
         clean_input_data:dict[str, DataFrame] = self._clean_input_data(input_data, data_cleaner)
@@ -39,35 +40,45 @@ class WorkflowImp(Workflow):
     @debug
     def _build_data_frames(self, data_files:dict[str, list[dict[str, Path | str]]]) -> dict[str, DataFrame]:
         input_data: dict[str, DataFrame] = dict()
+        work_dir: Path = self.file_handler.file_directories["work"]
 
         for filetype, data_file in data_files.items():
             input_data[filetype] = DataFrame()
             for _file in data_file:
                 data_loader: DataLoader = self.get_data_loader_class(_file["extension"])
                 file_stream:TextIO | None = None
+                file_path: Path | None = None
                 try:
-                    file_stream = self.file_handler.load(_file["file_path"])
+
+                    file_path = self.file_handler.move(_file["file_path"], work_dir / _file["file_path"].name)
+                    _file["file_path"] = file_path
+                    file_stream = self.file_handler.load(file_path)
                     file_data_frame:DataFrame = data_loader.as_dataframe(file_stream)
+                    file_stream.close()
+
                     input_data[filetype] = concat((input_data[filetype], file_data_frame))
 
                 except FileNotFoundError:
-                    logging.error(f"File {_file["file_path"].name} was not found at {_file["file_path"]}")
-                    self.file_handler.move(_file["file_path"], self.file_handler.file_directories["error"] / _file.name)
+                    logging.error(f"File {file_path.name} was not found at {file_path}")
+                    _file["file_path"] = self.file_handler.move(_file["file_path"], self.file_handler.file_directories["error"] / file_path.name)
 
                 except PermissionError:
-                    logging.error(f"Can not open file {_file["file_path"].name} at {_file["file_path"]}, permission error")
-                    self.file_handler.move(_file["file_path"], self.file_handler.file_directories["error"] / _file.name)
+                    logging.error(f"Can not open file {file_path.name} at {file_path}, permission error")
+                    _file["file_path"] = self.file_handler.move(_file["file_path"], self.file_handler.file_directories["error"] / file_path.name)
 
                 except Exception:
-                    logging.error(f"Unknown error occurred processing file {_file["file_path"].name} at {_file["file_path"]}")
-                    self.file_handler.move(_file["file_path"], self.file_handler.file_directories["error"] / _file.name)
+                    logging.error(f"Unknown error occurred processing file {file_path.name} at {file_path}")
+                    _file["file_path"] = self.file_handler.move(_file["file_path"], self.file_handler.file_directories["error"] / file_path.name)
 
                 else:
                     file_dirs:dict = self.file_handler.file_directories
-                    self.file_handler.move(_file["file_path"], file_dirs["done"] / "processed_data" / _file.name)
+                    _file["file_path"] = self.file_handler.move(file_path, file_dirs["done"] / "processed_data" / file_path.name)
 
                 finally:
-                    file_stream.close()
+                    try:
+                        file_stream.close()
+                    except BufferError:
+                        pass
 
         return input_data
 
@@ -76,9 +87,8 @@ class WorkflowImp(Workflow):
         data_files:dict[str, list[dict[str, Path | str]]] = dict()
 
         for file_type in file_types:
-            work_dir:Path = self.file_handler.file_directories["work"]
             #Path.suffix returns the '.' at along with the extension, like '.py'
-            data_files[file_type["type"]] = [ { "file_path": self.file_handler.move(file, work_dir / file.name), "extension":str(file.suffix[1:]) }
+            data_files[file_type["type"]] = [ { "file_path": file, "extension":str(file.suffix[1:]) }
                                               for file in self.file_handler.get_file_list(file_type["file_regex"]) ]
         return data_files
 

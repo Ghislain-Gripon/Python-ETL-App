@@ -10,10 +10,10 @@ class FolderStructure:
         self.config:dict = dict()
         self.file_directories = dict()
 
-    def move(self, source: str, target: str):
+    def move(self, source: str | Path, target: str | Path):
         pass
 
-    def load(self, file_path: str):
+    def load(self, file_path: str | Path):
         pass
 
     def read_yaml(self, file_stream) -> dict:

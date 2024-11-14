@@ -25,5 +25,5 @@ class DataCleanerImpl(DataCleaner):
     @debug
     def clean_date(self, df:DataFrame, columns:list) -> DataFrame:
         for column in columns:
-            df[column] = pd.to_datetime(df[column], format="mixed")
+            df[column] = pd.to_datetime(df[column], format="mixed", dayfirst=True)
         return df

@@ -1,3 +1,5 @@
+from operator import index
+
 import pandas as pd
 from pandas import DataFrame
 from src.Graph import Graph
@@ -12,14 +14,14 @@ class GraphDrugs(Graph):
         nodes:list[dict] = []
         edges:list[dict] = []
 
-        for _, drug in drugs_df.itertuples():
+        for _, drug in drugs_df.iterrows():
             nodes.append({"type": "drug", "data": drug["drug"]})
-            drug_in_pubmed_trials_df: DataFrame = pubmed_and_clinical_trials_df.iloc[drug["drug"] in pubmed_and_clinical_trials_df["title"]]
-            for _, mention in drug_in_pubmed_trials_df.itertuples():
-                nodes.append({"type": mention["type"], "data": drug_in_pubmed_trials_df["title"]})
-                nodes.append({"type": "journal", "data": drug_in_pubmed_trials_df["journal"]})
-                edges.append({"source": drug["drug"], "target": drug_in_pubmed_trials_df["title"], "date": drug_in_pubmed_trials_df["date"]})
-                edges.append({"source": drug_in_pubmed_trials_df["title"], "target": drug_in_pubmed_trials_df["journal"], "date": drug_in_pubmed_trials_df["date"]})
+            drug_in_pubmed_trials_df: DataFrame = pubmed_and_clinical_trials_df[pubmed_and_clinical_trials_df["title"].str.contains(drug["drug"])]
+            for _, mention in drug_in_pubmed_trials_df.iterrows():
+                nodes.append({"type": mention["type"], "data": mention["title"]})
+                nodes.append({"type": "journal", "data": mention["journal"]})
+                edges.append({"source": drug["drug"], "target": mention["title"], "date": mention["date"]})
+                edges.append({"source": mention["title"], "target": mention["journal"], "date": mention["date"]})
 
         self.graph["nodes"] = pd.DataFrame.from_records(nodes)
         self.graph["edges"] = pd.DataFrame.from_records(edges)

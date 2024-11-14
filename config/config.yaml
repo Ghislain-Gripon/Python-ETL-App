@@ -2,7 +2,7 @@ execution_environment:
    local:
           data_origin: 'csv'
           data_directory_path:
-              base_path: ../data
+              base_path: data
               data:
                   input:
                       base_path: input
@@ -19,7 +19,7 @@ execution_environment:
                         - processed_data
                   file_type:
                     - type: clinical_trials
-                      file_regex: "^clinial_trials[.](?P<ext>csv|json)$"
+                      file_regex: "^clinical_trials[.](?P<ext>csv|json)$"
                     - type: drugs
                       file_regex: "^drugs[.](?P<ext>csv|json)$"
                     - type: pubmed

@@ -12,7 +12,6 @@ class Workflow:
         self.file_handler:FolderStructure = _file_handler
         self.config: dict = self.file_handler.get_config()
         self.data_loaders:dict = dict()
-        self.run_flow()
 
     @debug
     def run_flow(self, ):
@@ -30,9 +29,9 @@ class Workflow:
 
         match file_extension:
             case "csv":
-                self.data_loaders["csv"] = DataLoaderCSV
+                self.data_loaders["csv"] = DataLoaderCSV()
             case "json":
-                self.data_loaders["json"] = DataLoaderJSON
+                self.data_loaders["json"] = DataLoaderJSON()
             case _:
                 raise ValueError(f"'{file_extension}' extension is not supported or does not exist")
 
