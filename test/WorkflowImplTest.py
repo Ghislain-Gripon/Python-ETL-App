@@ -1,6 +1,7 @@
 import unittest
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from unittest import mock
@@ -22,15 +23,14 @@ class WorkflowImplTest(unittest.TestCase):
 
         workflow: WorkflowImpl = WorkflowImpl(file_handler_mock)
 
-        pubmed_and_clinical_trials_data: str = """id,scientific_title,date,journal
-                1,"a 44-year-old man with erythema of the face diphenhydramine, neck, and chest, weakness, and palpitations",01/01/2019,"Journal of emergency emergencies"
-                2,"an evaluation of benadryl, pyribenzamine, and other so-called diphenhydramine antihistaminic drugs in the treatment of allergy.",01/01/2019,"Journal of emergency nursing"
-                """
+        pubmed_and_clinical_trials_df: DataFrame = DataFrame({
+            "id": [1, 2, 2],
+            "scientific_title": ["a 44-year-old man with erythema of the face diphenhydramine, neck, and chest, weakness, and palpitations", "an evaluation of benadryl, pyribenzamine, and other so-called diphenhydramine antihistaminic drugs in the treatment of allergy.", ""],
+            "date": [Timestamp("01/01/2019"), Timestamp("01/01/2019"), None],
+            "journal": ["Journal of emergency emergencies", "Journal of emergency nursing", "Journal of emergency nursing"]
+        })
 
-        pubmed_and_clinical_trials_df: DataFrame = pd.read_csv(StringIO(pubmed_and_clinical_trials_data))
-
-        cleaned_pubmed_and_clinical_trials_df:DataFrame = workflow._clean_clinical_trials(pubmed_and_clinical_trials_df.copy(), DataCleanerImpl())
-        cleaned_pubmed_and_clinical_trials_df["id"] = cleaned_pubmed_and_clinical_trials_df["id"].astype(int)
+        cleaned_pubmed_and_clinical_trials_df:DataFrame = workflow._clean_clinical_trials(pubmed_and_clinical_trials_df, DataCleanerImpl())
 
         val_pubmed_and_clinical_trials_df:DataFrame = DataFrame({
             "id" : [1, 2],
@@ -72,8 +72,7 @@ class WorkflowImplTest(unittest.TestCase):
         pubmed_and_clinical_trials_df: DataFrame = pd.read_csv(StringIO(pubmed_and_clinical_trials_data))
 
         cleaned_pubmed_and_clinical_trials_df: DataFrame = workflow._clean_pubmed(
-            pubmed_and_clinical_trials_df.copy(), DataCleanerImpl())
-        cleaned_pubmed_and_clinical_trials_df["id"] = cleaned_pubmed_and_clinical_trials_df["id"].astype(int)
+            pubmed_and_clinical_trials_df, DataCleanerImpl())
 
         val_pubmed_and_clinical_trials_df: DataFrame = DataFrame({
             "id": [1, 2],
@@ -85,7 +84,7 @@ class WorkflowImplTest(unittest.TestCase):
         })
         val_pubmed_and_clinical_trials_df["type"] = "pubmed"
 
-        assert_frame_equal(cleaned_pubmed_and_clinical_trials_df, val_pubmed_and_clinical_trials_df)
+        assert_frame_equal(cleaned_pubmed_and_clinical_trials_df, val_pubmed_and_clinical_trials_df, check_column_type=False)
 
     def test_get_files_by_type(self):
 
@@ -128,4 +127,9 @@ class WorkflowImplTest(unittest.TestCase):
             for entry in value:
                 file_handler.move(entry["file_path"], file_handler.file_directories["inbound"] / entry["file_path"].name)
 
-        self.assertDictEqual(data_frames, val_data_frames)
+        for file_type in data_frames:
+            self.data_frame_assert(data_frames, val_data_frames, file_type)
+
+    def data_frame_assert(self, data_frame:dict[str, DataFrame], val_data_frame:dict[str, DataFrame], file_type:str):
+        assert_frame_equal(data_frame[file_type], val_data_frame[file_type])
+

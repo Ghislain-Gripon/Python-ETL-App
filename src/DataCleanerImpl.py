@@ -19,7 +19,7 @@ class DataCleanerImpl(DataCleaner):
     @debug
     def clean_numbers(self, df:DataFrame, columns:list) -> DataFrame:
         for column in columns:
-            df[column] = pd.to_numeric(df[column], "coerce")
+            df[column] = pd.to_numeric(df[column], errors="coerce", downcast="integer")
         return df
 
     @debug

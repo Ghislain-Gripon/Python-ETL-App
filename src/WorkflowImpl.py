@@ -102,14 +102,9 @@ class WorkflowImpl(Workflow):
     @debug
     def _clean_clinical_trials(self, clinical_trials_data:DataFrame, data_cleaner:DataCleaner) -> DataFrame:
         clinical_trials_data.rename(columns={"scientific_title": "title"}, inplace=True)
-        clinical_trials_data = data_cleaner.clean_string(clinical_trials_data, ["title","journal"])
-        clinical_trials_data = data_cleaner.clean_date(clinical_trials_data, ["date"])
-        clinical_trials_data.replace("", np.nan, inplace=True)
-        clinical_trials_data.dropna(subset=["journal"], inplace=True)
-        clinical_trials_data[["id", "date", "journal"]] = clinical_trials_data.groupby("title").transform(lambda x: x.loc[~x.isnull()].iloc[0])[["id", "date", "journal"]]
-        clinical_trials_data.drop_duplicates(inplace=True)
-        clinical_trials_data["type"] = "clinical_trials"
-        return clinical_trials_data
+        clinical_trials_data_cleaned:DataFrame = self._clean_pubmed_or_clinical_trials(clinical_trials_data, data_cleaner)
+        clinical_trials_data_cleaned["type"] = "clinical_trials"
+        return clinical_trials_data_cleaned
 
     @debug
     def _clean_drugs(self, drugs_data: DataFrame, data_cleaner:DataCleaner) -> DataFrame:
@@ -121,13 +116,32 @@ class WorkflowImpl(Workflow):
 
     @debug
     def _clean_pubmed(self, pubmed_data: DataFrame, data_cleaner:DataCleaner) -> DataFrame:
-        pubmed_data = data_cleaner.clean_string(pubmed_data, ["title", "journal"])
-        pubmed_data = data_cleaner.clean_date(pubmed_data, ["date"])
-        pubmed_data.replace("", np.nan, inplace=True)
-        pubmed_data.dropna(subset=["journal"], inplace=True)
-        pubmed_data[["id", "date", "journal"]] = pubmed_data.groupby("title").transform(lambda x: x.loc[~x.isnull()].iloc[0])[["id", "date", "journal"]]
-        pubmed_data.drop_duplicates(inplace=True)
-        pubmed_data["type"] = "pubmed"
-        return pubmed_data
+        pubmed_data_fused:DataFrame = self._clean_pubmed_or_clinical_trials(pubmed_data, data_cleaner)
+        pubmed_data_fused["type"] = "pubmed"
+        return pubmed_data_fused
+
+    @debug
+    def _clean_pubmed_or_clinical_trials(self, pubmed_or_clinical_trials_data:DataFrame, data_cleaner:DataCleaner) -> DataFrame:
+        pubmed_or_clinical_trials_data = data_cleaner.clean_string(pubmed_or_clinical_trials_data, ["title", "journal"])
+        pubmed_or_clinical_trials_data = data_cleaner.clean_date(pubmed_or_clinical_trials_data, ["date"])
+        pubmed_or_clinical_trials_data = data_cleaner.clean_numbers(pubmed_or_clinical_trials_data, ["id"])
+        pubmed_or_clinical_trials_data = pubmed_or_clinical_trials_data.replace("", np.nan)
+
+        pubmed_or_clinical_trials_data_fill_missing_by_title: DataFrame = pubmed_or_clinical_trials_data.copy(deep=True)
+        pubmed_or_clinical_trials_data_fill_missing_by_title[["id", "date", "journal"]] = pubmed_or_clinical_trials_data_fill_missing_by_title.groupby("title").bfill()[["id", "date", "journal"]]
+
+        pubmed_or_clinical_trials_data_fill_missing_by_title.dropna(subset=["journal", "title", "date"], inplace=True)
+
+        pubmed_or_clinical_trials_data_fill_missing_by_id: DataFrame = pubmed_or_clinical_trials_data.copy(deep=True)
+        pubmed_or_clinical_trials_data_fill_missing_by_id[["title", "date", "journal"]] = pubmed_or_clinical_trials_data_fill_missing_by_id.groupby("id").bfill()[["title", "date", "journal"]]
+
+        pubmed_or_clinical_trials_data_fill_missing_by_id.dropna(subset=["journal", "title", "date"], inplace=True)
+
+        pubmed_or_clinical_trials_data_fused: DataFrame = concat(
+            (pubmed_or_clinical_trials_data_fill_missing_by_title, pubmed_or_clinical_trials_data_fill_missing_by_id))
+
+        pubmed_or_clinical_trials_data_fused.drop_duplicates(inplace=True)
+        pubmed_or_clinical_trials_data_fused["id"] = pubmed_or_clinical_trials_data_fused["id"].astype(np.int64)
+        return pubmed_or_clinical_trials_data_fused
 
 

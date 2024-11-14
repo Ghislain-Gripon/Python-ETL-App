@@ -27,7 +27,5 @@ execution_environment:
               config:
                   directories:
                       config: config
-                      flows: flows
                   files:
                       logger_config: logger_config.yaml
-                      flows: flows.yaml
