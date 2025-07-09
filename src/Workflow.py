@@ -8,17 +8,17 @@ from src.FolderStructure import FolderStructure
 class Workflow:
 
     @debug
-    def __init__(self, _file_handler:FolderStructure):
-        self.file_handler:FolderStructure = _file_handler
+    def __init__(self, _file_handler: FolderStructure):
+        self.file_handler: FolderStructure = _file_handler
         self.config: dict = self.file_handler.get_config()
-        self.data_loaders:dict = dict()
+        self.data_loaders: dict = dict()
 
     @debug
     def run_flow(self, ):
         pass
 
     @debug
-    def get_data_loader_class(self, file_extension:str) -> DataLoader:
+    def get_data_loader_class(self, file_extension: str) -> DataLoader:
         """
         Fetches the DataLoader class corresponding to file_extension
 

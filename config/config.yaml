@@ -1,5 +1,6 @@
 execution_environment:
    local:
+          encoding: "utf-8-sig"
           data_origin: 'csv'
           data_directory_path:
               base_path: data

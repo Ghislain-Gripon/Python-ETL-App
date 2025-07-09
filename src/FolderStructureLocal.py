@@ -50,7 +50,7 @@ class FolderStructureLocal(FolderStructure):
     def load(self, file_path: str | Path) -> TextIO:
         path: Path = Path(file_path)
         if Path.is_file(path):
-            return open(path, 'r', encoding="utf-8-sig")
+            return open(path, 'r', encoding=self.config["encoding"])
         else:
             logging.error(f"No file located at {file_path}")
             raise FileNotFoundError(f"There is no file at {path}")
