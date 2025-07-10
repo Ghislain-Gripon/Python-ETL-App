@@ -16,4 +16,4 @@ services:
       - neo4j_auth_file
 secrets:
   neo4j_auth_file:
-    file: ./neo4j_auth_file.txt
+    file: ./neo4j_auth_dev.txt

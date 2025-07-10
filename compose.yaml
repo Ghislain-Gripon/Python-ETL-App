@@ -8,6 +8,3 @@ services:
       - "7687:7687"
     environment:
       - NEO4J_AUTH_FILE=/run/secrets/neo4j_auth_file
-secrets:
-  neo4j_auth_file:
-    file: ./neo4j_auth.txt
