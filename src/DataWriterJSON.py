@@ -12,6 +12,6 @@ class DataWriterJSON(DataWriter):
 
 	def write(self, file_path: Path | str, data: DataFrame):
 		if self.file_handler.exists(file_path):
-			data.to_json(file_path)
-		else:
 			raise FileExistsError
+		else:
+			data.to_json(file_path, orient="records")
