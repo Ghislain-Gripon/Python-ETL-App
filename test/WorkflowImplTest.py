@@ -102,10 +102,10 @@ class WorkflowImplTest(unittest.TestCase):
             workflow.config["data_directory_path"]["data"]["file_type"])
 
         val_file_dict: dict[str, list[dict[str, Path | str]]] = {
-            "clinical_trials": [{ "file_path": Path("data/input/inbound/clinical_trials.csv"), "extension": "csv" }],
-            "drugs": [{ "file_path": Path("data/input/inbound/drugs.csv"), "extension": "csv" }],
-            "pubmed": [{ "file_path": Path("data/input/inbound/pubmed.csv"), "extension": "csv" },
-                       { "file_path": Path("data/input/inbound/pubmed.json"), "extension": "json" }]
+            "clinical_trials": [{ "file_path_or_buffer": Path("data/input/inbound/clinical_trials.csv"), "extension": "csv" }],
+            "drugs": [{ "file_path_or_buffer": Path("data/input/inbound/drugs.csv"), "extension": "csv" }],
+            "pubmed": [{ "file_path_or_buffer": Path("data/input/inbound/pubmed.csv"), "extension": "csv" },
+                       { "file_path_or_buffer": Path("data/input/inbound/pubmed.json"), "extension": "json" }]
             }
 
         self.assertDictEqual(file_dict, val_file_dict)
@@ -116,10 +116,10 @@ class WorkflowImplTest(unittest.TestCase):
         workflow: WorkflowImpl = WorkflowImpl(file_handler)
 
         file_dict: dict[str, list[dict[str, Path | str]]] = {
-            "clinical_trials": [{ "file_path": Path("data/input/inbound/clinical_trials.csv"), "extension": "csv" }],
-            "drugs": [{ "file_path": Path("data/input/inbound/drugs.csv"), "extension": "csv" }],
-            "pubmed": [{ "file_path": Path("data/input/inbound/pubmed.csv"), "extension": "csv" },
-                       { "file_path": Path("data/input/inbound/pubmed.json"), "extension": "json" }]
+            "clinical_trials": [{ "file_path_or_buffer": Path("data/input/inbound/clinical_trials.csv"), "extension": "csv" }],
+            "drugs": [{ "file_path_or_buffer": Path("data/input/inbound/drugs.csv"), "extension": "csv" }],
+            "pubmed": [{ "file_path_or_buffer": Path("data/input/inbound/pubmed.csv"), "extension": "csv" },
+                       { "file_path_or_buffer": Path("data/input/inbound/pubmed.json"), "extension": "json" }]
             }
 
         val_data_frames: dict[str, DataFrame] = dict()
@@ -128,14 +128,14 @@ class WorkflowImplTest(unittest.TestCase):
             for entry in value:
                 val_data_frames[file_type] = pd.concat((val_data_frames[file_type],
                                                         workflow.get_data_loader_class(entry["extension"]).as_dataframe(
-                                                            entry["file_path"])))
+                                                            entry["file_path_or_buffer"])))
 
         data_frames: dict[str, DataFrame] = workflow._build_data_frames(file_dict)
 
         for _, value in file_dict.items():
             for entry in value:
                 file_handler.move(
-                    entry["file_path"], file_handler.file_directories["inbound"] / entry["file_path"].name)
+                    entry["file_path_or_buffer"], file_handler.file_directories["inbound"] / entry["file_path_or_buffer"].name)
 
         for file_type in data_frames:
             self.data_frame_assert(data_frames, val_data_frames, file_type)

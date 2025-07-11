@@ -4,7 +4,7 @@ from typing import TextIO
 import pandas, json5
 from pandas import DataFrame
 
-from src.DataLoader import DataLoader
+from DataLoader import DataLoader
 
 
 class DataLoaderJSON(DataLoader):

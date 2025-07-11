@@ -7,6 +7,7 @@ from pandas.errors import ParserError
 from src.DataCleaner import DataCleaner
 from src.DataCleanerImpl import DataCleanerImpl
 from src.DataLoader import DataLoader
+from src.DataWriterJSON import DataWriterJSON
 from src.Decorators import debug
 from src.Graph import Graph
 from src.GraphDrugs import GraphDrugs
@@ -33,8 +34,10 @@ class WorkflowImpl(Workflow):
 
         file_dirs: dict = self.file_handler.file_directories
         graph: dict = relationship_graph.get_graph()
-        self.file_handler.write(graph["nodes"], file_dirs["done"] / "graph" / "nodes.csv")
-        self.file_handler.write(graph["edges"], file_dirs["done"] / "graph" / "edges.csv")
+        json_writer: DataWriterJSON = DataWriterJSON(self.file_handler)
+
+        json_writer.write(graph["nodes"], file_dirs["done"] / "graph" / "nodes.json")
+        json_writer.write(graph["edges"], file_dirs["done"] / "graph" / "edges.json")
 
 
     @debug
@@ -47,9 +50,9 @@ class WorkflowImpl(Workflow):
                 input_data[data_file["type"]] = DataFrame()
 
             data_loader: DataLoader = self.get_data_loader_class(data_file["extension"])
-            file_path = data_file["file_path"]
+            file_path = data_file["file_path_or_buffer"]
             try:
-                data_file["file_path"] = self.file_handler.move(file_path, work_dir / data_file["file_path"].name)
+                data_file["file_path_or_buffer"] = self.file_handler.move(file_path, work_dir / data_file["file_path_or_buffer"].name)
 
                 with self.file_handler.load(file_path) as f:
                     file_data_frame: DataFrame = data_loader.as_dataframe(f, self.config["encoding"])
@@ -61,22 +64,22 @@ class WorkflowImpl(Workflow):
 
             except PermissionError:
                 logging.error(f"Can not open file {file_path.name} at {file_path}, permission error")
-                data_file["file_path"] = self.file_handler.move(
-                    data_file["file_path"], self.file_handler.file_directories["error"] / file_path.name)
+                data_file["file_path_or_buffer"] = self.file_handler.move(
+                    data_file["file_path_or_buffer"], self.file_handler.file_directories["error"] / file_path.name)
 
             except ParserError:
                 logging.error(f"File {file_path.name} at {file_path} wasn't parsed correctly")
-                data_file["file_path"] = self.file_handler.move(
-                    data_file["file_path"], self.file_handler.file_directories["error"] / file_path.name)
+                data_file["file_path_or_buffer"] = self.file_handler.move(
+                    data_file["file_path_or_buffer"], self.file_handler.file_directories["error"] / file_path.name)
 
             except Exception:
                 logging.error(f"Unknown error occurred processing file {file_path.name} at {file_path}")
-                data_file["file_path"] = self.file_handler.move(
-                    data_file["file_path"], self.file_handler.file_directories["error"] / file_path.name)
+                data_file["file_path_or_buffer"] = self.file_handler.move(
+                    data_file["file_path_or_buffer"], self.file_handler.file_directories["error"] / file_path.name)
 
             else:
                 file_dirs: dict = self.file_handler.file_directories
-                data_file["file_path"] = self.file_handler.move(file_path,
+                data_file["file_path_or_buffer"] = self.file_handler.move(file_path,
                     file_dirs["done"] / "processed_data" / file_path.name)
 
         return input_data
@@ -87,7 +90,7 @@ class WorkflowImpl(Workflow):
 
         for file_type in file_types:
             # Path.suffix returns the '.' at along with the extension, like '.py'
-            data_files += [{ "type": file_type["type"], "file_path": file_path, "extension": str(file_path.suffix[1:]) }
+            data_files += [{ "type": file_type["type"], "file_path_or_buffer": file_path, "extension": str(file_path.suffix[1:]) }
                            for file_path in self.file_handler.get_file_list(file_type["file_regex"])]
         return data_files
 

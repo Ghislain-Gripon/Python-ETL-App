@@ -2,3 +2,4 @@ PyYAML~=6.0.2
 pandas~=2.2.3
 numpy~=2.1.2
 json5~=0.9.28
+neo4j~=5.28.1
