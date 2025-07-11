@@ -1,0 +1,23 @@
+execution_environment:
+   local:
+          data_origin: 'csv'
+          data_directory_path:
+              base_path: data
+              data:
+                  input:
+                      base_path: input
+                      directories:
+                            - inbound
+                            - work
+                  output:
+                      base_path: output
+                      directories:
+                            - error
+                            - done
+              config:
+                  directories:
+                      config: config
+                      flows: flows
+                  files:
+                      logger_config_path: logger_config.yaml
+                      flows_path: flows.yaml
