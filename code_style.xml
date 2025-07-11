@@ -1,0 +1,13 @@
+<code_scheme name="Project" version="173">
+  <Python>
+    <option name="SPACE_WITHIN_BRACES" value="true" />
+    <option name="SPACE_AROUND_POWER_OPERATOR" value="false" />
+  </Python>
+  <codeStyleSettings language="Python">
+    <option name="SPACE_AROUND_ADDITIVE_OPERATORS" value="false" />
+    <option name="SPACE_AROUND_MULTIPLICATIVE_OPERATORS" value="false" />
+    <indentOptions>
+      <option name="USE_TAB_CHARACTER" value="true" />
+    </indentOptions>
+  </codeStyleSettings>
+</code_scheme>
