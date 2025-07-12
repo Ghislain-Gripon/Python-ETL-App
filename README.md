@@ -1,0 +1,1 @@
+![answer 4.2](question_4-2.png)

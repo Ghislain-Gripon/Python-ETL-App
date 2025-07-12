@@ -1,8 +1,9 @@
 from pandas import DataFrame
 
-from FolderStructure import FolderStructure
+from src.file_system.FolderStructure import FolderStructure
 
 from pathlib import Path
+
 
 class DataWriter:
 

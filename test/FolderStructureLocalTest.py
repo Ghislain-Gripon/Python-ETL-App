@@ -1,11 +1,8 @@
-import sys
 import unittest
 from os.path import exists
-import pandas as pd
-from pandas.testing import assert_frame_equal
 from pathlib import Path
 
-from src.FolderStructureLocal import FolderStructureLocal
+from src.file_system.FolderStructureLocal import FolderStructureLocal
 
 class FolderStructureLocalTest(unittest.TestCase):
 

@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas import DataFrame
 
-from src.DataCleaner import DataCleaner
+from src.cleaner.DataCleaner import DataCleaner
 from src.Decorators import debug
 
 class DataCleanerImpl(DataCleaner):

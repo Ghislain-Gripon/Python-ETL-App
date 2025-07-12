@@ -1,7 +1,6 @@
 import unittest
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from unittest import mock
@@ -9,10 +8,10 @@ from pandas import DataFrame, Timestamp
 from pandas.testing import assert_frame_equal
 from io import StringIO
 
-from src.DataCleanerImpl import DataCleanerImpl
-from src.FolderStructure import FolderStructure
-from src.FolderStructureLocal import FolderStructureLocal
-from src.WorkflowImpl import WorkflowImpl
+from src.cleaner.DataCleanerImpl import DataCleanerImpl
+from src.file_system.FolderStructure import FolderStructure
+from src.file_system.FolderStructureLocal import FolderStructureLocal
+from src.workflows.WorkflowImpl import WorkflowImpl
 
 
 class WorkflowImplTest(unittest.TestCase):

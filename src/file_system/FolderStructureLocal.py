@@ -1,14 +1,10 @@
-import io
 import logging
 import logging.config
 import re
 
 from typing import TextIO
 
-from pandas import DataFrame
-
-from src import DataWriter
-from src.FolderStructure import FolderStructure
+from FolderStructure import FolderStructure
 from pathlib import Path
 from src.Decorators import debug
 from yaml import safe_load
@@ -19,18 +15,18 @@ class FolderStructureLocal(FolderStructure):
 	def __init__(self, _config_file_path: str | Path = None):
 
 		config_file_path: Path = Path(_config_file_path) if _config_file_path is not None else Path(
-			"../config/config.yaml")
+			"config/config.yaml")
 		super().__init__(config_file_path)
 
 		config_file_stream = self.load(Path(self.config_file_path))
 		self.config: dict = self.read_yaml(config_file_stream)["execution_environment"]["local"]
 		config_file_stream.close()
 
-		logger_config_stream = self.load(Path(self.config["data_directory_path"]["config"]["directories"][
-												  "config"])/
-										 self.config["data_directory_path"]["config"]["files"]["logger_config"])
-		logging.config.dictConfig(self.read_yaml(logger_config_stream))
-		logger_config_stream.close()
+		logger_config_path: Path = Path(self.config["data_directory_path"]["config"]["directories"]["config"])/ \
+								   self.config["data_directory_path"]["config"]["files"]["logger_config"]
+
+		with self.load(logger_config_path) as f:
+			logging.config.dictConfig(self.read_yaml(f))
 
 		for io_direction in ["input", "output"]:
 
