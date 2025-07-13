@@ -5,7 +5,7 @@ from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 from io import StringIO
 
-from src.GraphDrugs import GraphDrugs
+from src.graph.GraphDrugs import GraphDrugs
 
 class GraphDrugsTest(unittest.TestCase):
 

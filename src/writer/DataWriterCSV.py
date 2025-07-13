@@ -1,7 +1,7 @@
 from pandas import DataFrame
 
 from DataWriter import DataWriter
-from FolderStructure import FolderStructure
+from src.file_system.FolderStructure import FolderStructure
 
 from pathlib import Path
 

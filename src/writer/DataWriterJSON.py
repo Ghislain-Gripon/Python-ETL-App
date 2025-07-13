@@ -1,7 +1,7 @@
 from pandas import DataFrame
 
 from DataWriter import DataWriter
-from FolderStructure import FolderStructure
+from src.file_system.FolderStructure import FolderStructure
 
 from pathlib import Path
 
@@ -14,4 +14,4 @@ class DataWriterJSON(DataWriter):
 		if self.file_handler.exists(file_path):
 			raise FileExistsError
 		else:
-			data.to_json(file_path, orient="records")
+			data.to_json(file_path, orient="records", date_format="iso", date_unit="s")

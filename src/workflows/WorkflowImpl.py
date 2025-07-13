@@ -4,14 +4,14 @@ from pathlib import Path
 import numpy as np
 from pandas import DataFrame, concat
 from pandas.errors import ParserError
-from src.DataCleaner import DataCleaner
-from src.DataCleanerImpl import DataCleanerImpl
-from src.DataLoader import DataLoader
-from src.DataWriterJSON import DataWriterJSON
+from src.cleaner.DataCleaner import DataCleaner
+from src.cleaner.DataCleanerImpl import DataCleanerImpl
+from src.loader.DataLoader import DataLoader
+from src.writer.DataWriterJSON import DataWriterJSON
 from src.Decorators import debug
-from src.Graph import Graph
-from src.GraphDrugs import GraphDrugs
-from src.Workflow import Workflow
+from src.graph.Graph import Graph
+from src.graph.GraphDrugs import GraphDrugs
+from Workflow import Workflow
 
 
 class WorkflowImpl(Workflow):

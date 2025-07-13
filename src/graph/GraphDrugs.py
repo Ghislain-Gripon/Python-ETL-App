@@ -1,8 +1,6 @@
-from operator import index
-
 import pandas as pd
 from pandas import DataFrame
-from src.Graph import Graph
+from Graph import Graph
 
 
 class GraphDrugs(Graph):
