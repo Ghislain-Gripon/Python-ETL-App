@@ -8,7 +8,7 @@ class DBServer:
 	def __init__(self, _file_handler: FolderStructure):
 		self.file_handler: FolderStructure = _file_handler
 
-	def query(self, query: LiteralString):
+	def query(self, query: LiteralString, **kwargs):
 		pass
 
 	def __enter__(self):

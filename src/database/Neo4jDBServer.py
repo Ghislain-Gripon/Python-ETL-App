@@ -15,8 +15,8 @@ class Neo4jDBServer(DBServer):
 		self.driver: Driver = None
 
 	@debug
-	def query(self, query: LiteralString):
-		return self.driver.execute_query(query)
+	def query(self, query: LiteralString, **kwargs):
+		return self.driver.execute_query(query, database_="neo4j", **kwargs)
 
 	def __enter__(self):
 		neo4j_env_vars: dict[str, str] = self.file_handler.config["database"].get("neo4j")
@@ -29,8 +29,8 @@ class Neo4jDBServer(DBServer):
 
 		self.driver: Driver = GraphDatabase.driver(
 			uri, auth=auth, connection_timeout=60.0,
-			connection_acquisition_timeout=90.0
-			)
+			connection_acquisition_timeout=90.0,
+		)
 		self.driver.verify_connectivity()
 		return self
 
