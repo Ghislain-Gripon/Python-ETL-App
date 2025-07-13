@@ -1,30 +1,45 @@
 from pathlib import Path
+from abc import abstractmethod
 
 
 class FolderStructure:
 
-	def __init__(self, config_file_path=None):
-		self.config_file_path = config_file_path
+	def __init__(self, config_file_path: Path):
+		self.config_file_path: Path = Path(config_file_path)
+
 		self.config: dict = dict()
-		self.file_directories = dict()
 
-	def move(self, source: str | Path, target: str | Path) -> Path:
+		self.file_directories: dict[str, Path] = dict()
+
+	@classmethod
+	@abstractmethod
+	def move(cls, source: Path, target: Path) -> Path:
 		pass
 
-	def load(self, file_path: str | Path):
+	@classmethod
+	@abstractmethod
+	def load(cls, file_path: Path):
 		pass
 
-	def read_yaml(self, file_stream) -> dict:
+	@classmethod
+	@abstractmethod
+	def read_yaml(cls, file_stream) -> dict[str, dict | str]:
 		pass
 
-	def get_file_list(self, regex: str) -> list[Path]:
+	@classmethod
+	@abstractmethod
+	def get_file_list(cls, regex: str) -> list[Path]:
 		pass
 
-	def get_config(self, ) -> dict:
+	@classmethod
+	@abstractmethod
+	def get_config(cls, ) -> dict[str, dict | str]:
 		"""
 		Returns the configuration dictionary.
 		"""
 		pass
 
-	def exists(self, file_path: Path | str) -> bool:
+	@classmethod
+	@abstractmethod
+	def exists(cls, file_path: Path) -> bool:
 		pass

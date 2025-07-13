@@ -1,20 +1,20 @@
-from src.loader.DataLoader import DataLoader
-from src.loader.DataLoaderCSV import DataLoaderCSV
-from src.loader.DataLoaderJSON import DataLoaderJSON
-from src.Decorators import debug
-from src.file_system.FolderStructure import FolderStructure
+from loader.DataLoader import DataLoader
+from loader.DataLoaderCSV import DataLoaderCSV
+from loader.DataLoaderJSON import DataLoaderJSON
+from Decorators import debug
+from file_system.FolderStructure import FolderStructure
 
 
 class Workflow:
 
-	@debug
+
 	def __init__(self, _file_handler: FolderStructure):
 		self.file_handler: FolderStructure = _file_handler
 		self.config: dict = self.file_handler.get_config()
 		self.data_loaders: dict = dict()
 
 	@debug
-	def run_flow(self, ):
+	def run_flow(self, ) -> None:
 		pass
 
 	@debug

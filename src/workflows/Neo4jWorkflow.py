@@ -1,43 +1,46 @@
+from pathlib import Path
 from typing import LiteralString
-import pandas
 from neo4j import Result
-from pprint import pprint
 
-from src.database.Neo4jDBServer import Neo4jDBServer
-from src.file_system.FolderStructure import FolderStructure
-from src.workflows.Workflow import Workflow
-
-
-def question_4_2(driver: Neo4jDBServer, drug: str):
-	result: Result = driver.query(
-		"""
-		MATCH (j:Journal)-[:MENTION]->(d1:Drugs) WHERE d1.name = $drug
-		MATCH (j)-[:MENTION]->(d:Drugs)-[:REFERENCE]->(:Pubmed) WHERE NOT (d)-[:REFERENCE]->(:Clinical_Trials) AND d.name <> d1.name
-		WITH d.name as Name
-		RETURN DISTINCT Name
-		""",
-		drug=drug
-	)
-	df: pandas.DataFrame = result.to_df()
-	summary = result.consume()
-	pprint(f"The query '{summary.query}' returned")
-	pprint(df.to_clipboard)
+from Decorators import debug
+from database.Neo4jDBServer import Neo4jDBServer
+from file_system.FolderStructure import FolderStructure
+from workflows.Workflow import Workflow
 
 
+@debug
 def question_4_1(driver: Neo4jDBServer):
 	result: Result = driver.query(
 		"""
-		MATCH (j:Journal)-[r:MENTION]->(:Drugs)
-		WITH j.name AS Journal, count(r) AS drug_mentionned
-		ORDER BY drug_mentionned DESC
-		RETURN Journal
-		LIMIT 1
+		MATCH (j:Journal)-[:MENTION]->(d:Drugs)
+		WITH j.name AS Journal, count(DISTINCT d) AS drug_mentionned
+		
+		WITH collect({Journal: Journal, count: drug_mentionned}) AS journal_counts
+		WITH journal_counts, reduce(maxVal = 0, jc IN journal_counts | 
+			 CASE WHEN jc.count > maxVal THEN jc.count ELSE maxVal END) AS max_count
+		
+		UNWIND journal_counts AS jc
+		WITH jc
+		WHERE jc.count = max_count
+		RETURN jc.Journal AS Journal
 		"""
 	)
-	df: pandas.DataFrame = result.to_df()
-	summary = result.consume()
-	pprint(f"The query '{summary.query}' returned")
-	pprint(df.to_clipboard)
+	return result
+
+
+@debug
+def question_4_2(driver: Neo4jDBServer, drug: str):
+	result: Result = driver.query(
+		"""
+		MATCH (j:Journal)-[:MENTION]->(d1:Drugs) WHERE d1.name = $drug  
+		MATCH (j)-[:MENTION]->(d:Drugs)-[:REFERENCE]->(:Pubmed) 
+		WHERE NOT (d)-[:REFERENCE]->(:Clinical_Trials) AND d.name <> d1.name  
+		WITH d.name as Name  
+		RETURN DISTINCT Name
+		""",
+		parameters={ "drug": drug }
+	)
+	return result
 
 
 class Neo4jWorkflow(Workflow):
@@ -45,10 +48,15 @@ class Neo4jWorkflow(Workflow):
 		super().__init__(_file_handler)
 
 	def run_flow(self, ):
-		with self.file_handler.load("ressources/neo4j/setup_graph.cypher") as f:
-			setup_neo4j_query: LiteralString = f.read()
+		with self.file_handler.load(Path("data/ressources/neo4j/setup_graph.cypher")) as f:
+			setup_neo4j_queries: LiteralString = f.read()
+
+		setup_neo4j = setup_neo4j_queries.split(";")
 
 		with Neo4jDBServer(self.file_handler) as driver:
-			driver.query(setup_neo4j_query)
+			for query in setup_neo4j:
+				driver.query(query)
+
+		with Neo4jDBServer(self.file_handler) as driver:
 			question_4_1(driver)
 			question_4_2(driver, "TETRACYCLINE")

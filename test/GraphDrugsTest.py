@@ -5,7 +5,7 @@ from pandas import DataFrame
 from pandas.testing import assert_frame_equal
 from io import StringIO
 
-from src.graph.GraphDrugs import GraphDrugs
+from graph.GraphDrugs import GraphDrugs
 
 class GraphDrugsTest(unittest.TestCase):
 
@@ -33,12 +33,24 @@ class GraphDrugsTest(unittest.TestCase):
                        "AN EVALUATION OF BENADRYL, PYRIBENZAMINE, AND OTHER SO-CALLED DIPHENHYDRAMINE ANTIHISTAMINIC DRUGS IN THE TREATMENT OF ALLERGY.",
                        "PYRIBENZAMINE",
                        "AN EVALUATION OF BENADRYL, PYRIBENZAMINE, AND OTHER SO-CALLED DIPHENHYDRAMINE ANTIHISTAMINIC DRUGS IN THE TREATMENT OF ALLERGY."],
+            "source_type": ["drug",
+                            "pubmed",
+                            "drug",
+                            "clinical_trials",
+                            "drug",
+                            "clinical_trials"],
             "target": ["A 44-YEAR-OLD MAN WITH ERYTHEMA OF THE FACE DIPHENHYDRAMINE, NECK, AND CHEST, WEAKNESS, AND PALPITATIONS",
                        "Journal of emergency emergencies",
                        "AN EVALUATION OF BENADRYL, PYRIBENZAMINE, AND OTHER SO-CALLED DIPHENHYDRAMINE ANTIHISTAMINIC DRUGS IN THE TREATMENT OF ALLERGY.",
                        "Journal of emergency nursing",
                        "AN EVALUATION OF BENADRYL, PYRIBENZAMINE, AND OTHER SO-CALLED DIPHENHYDRAMINE ANTIHISTAMINIC DRUGS IN THE TREATMENT OF ALLERGY.",
                        "Journal of emergency nursing"],
+            "target_type": ["pubmed",
+                            "journal",
+                            "clinical_trials",
+                            "journal",
+                            "clinical_trials",
+                            "journal"],
             "date": ["01/01/2019", "01/01/2019", "01/01/2019", "01/01/2019", "01/01/2019", "01/01/2019"]
         })
 

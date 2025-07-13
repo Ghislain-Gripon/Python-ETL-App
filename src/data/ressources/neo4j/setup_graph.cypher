@@ -63,4 +63,4 @@ CALL () {
 };
 
 MATCH (d: Drugs)-[:REFERENCE]->(t:Clinical_Trials|Pubmed)-[m:MENTION]->(j: Journal)
-MERGE (j)-[:MENTION {date: m.date}]->(d);
+MERGE (j)-[:MENTION {date: m.date}]->(d)

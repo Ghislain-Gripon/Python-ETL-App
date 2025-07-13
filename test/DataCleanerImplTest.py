@@ -6,7 +6,7 @@ import pandas as pd
 from pandas.testing import assert_series_equal
 from pandas.testing import assert_frame_equal
 from pandas import Timestamp
-from src.cleaner.DataCleanerImpl import DataCleanerImpl
+from cleaner.DataCleanerImpl import DataCleanerImpl
 
 
 class DataCleanerImplTest(unittest.TestCase):

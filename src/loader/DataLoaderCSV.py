@@ -1,13 +1,13 @@
 from pathlib import Path
 from typing import TextIO
 
-import pandas
-from pandas import DataFrame
+from pandas import DataFrame, read_csv
 
-from DataLoader import DataLoader
+from loader.DataLoader import DataLoader
 
 
 class DataLoaderCSV(DataLoader):
 
-	def as_dataframe(self, filepath_or_buffer: str | Path | TextIO, encoding: str) -> DataFrame:
-		return pandas.read_csv(filepath_or_buffer, encoding=encoding)
+	@classmethod
+	def as_dataframe(cls, filepath_or_buffer: str | Path | TextIO, encoding: str) -> DataFrame:
+		return read_csv(filepath_or_buffer, encoding=encoding)

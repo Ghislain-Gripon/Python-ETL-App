@@ -1,16 +1,14 @@
 services:
 
   neo4j:
-    image: "neo4j:community-ubi9"
+    image: "neo4j:enterprise-ubi9"
     hostname: neo4j
     container_name: neo4j
     volumes:
-      - $HOME/neo4j/logs:/logs
-      - $HOME/neo4j/config:/config
-      - $HOME/neo4j/data:/data
-      - $HOME/neo4j/plugins:/plugins
-      - ./data/output/done/graph:/import
+      - db-plugin:/plugins
+      - output-files:/import
     environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
       - NEO4J_AUTH_FILE=/run/secrets/neo4j_auth_file
       - NEO4J_apoc_export_file_enabled=true
       - NEO4J_apoc_import_file_enabled=true
@@ -20,21 +18,45 @@ services:
       - "7474:7474"
       - "7687:7687"
     restart: always
+    healthcheck:
+      test: [ "CMD", "neo4j", "status" ]
+      interval: 1m30s
+      start_interval: 30s
+      start_period: 30s
+      timeout: 10s
+      retries: 5
     secrets:
       - neo4j_auth_file
+    networks:
+      - db
 
   app:
-    build: .
+    build:
+      dockerfile: app.dockerfile
+      context: .
     hostname: app
     container_name: app
     environment:
       - NEO4J_AUTH_FILE=/run/secrets/neo4j_auth_file
-      - NEO4J_URI="neo4j://neo4j"
+      - NEO4J_URI=neo4j://neo4j
+    volumes:
+      - output-files:/src/data/output/done/graph
     secrets:
       - neo4j_auth_file
     depends_on:
-      - neo4j
+      neo4j:
+        condition: service_healthy
+    networks:
+      - db
 
 secrets:
   neo4j_auth_file:
-    file: ./neo4j_auth_dev.txt
+    file: "./neo4j_auth_dev.txt"
+
+networks:
+  db:
+    driver: bridge
+
+volumes:
+  db-plugin:
+  output-files:

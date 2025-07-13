@@ -4,18 +4,19 @@ import re
 
 from typing import TextIO
 
-from FolderStructure import FolderStructure
+from file_system.FolderStructure import FolderStructure
 from pathlib import Path
-from src.Decorators import debug
+from Decorators import debug
 from yaml import safe_load
 
 
 class FolderStructureLocal(FolderStructure):
 
-	def __init__(self, _config_file_path: str | Path = None):
+	def __init__(self, _config_file_path: Path):
 
 		config_file_path: Path = Path(_config_file_path) if _config_file_path is not None else Path(
-			"config/config.yaml")
+			"data/config/config.yaml"
+		)
 		super().__init__(config_file_path)
 
 		config_file_stream = self.load(Path(self.config_file_path))
@@ -64,23 +65,23 @@ class FolderStructureLocal(FolderStructure):
 				Safe loads a yaml dictionary from an open file stream.
 				"""
 
-		_file: dict = dict()
+		_file: dict[str, str | dict] = dict()
 
 		try:
-			_file: dict = safe_load(file_stream)
+			_file = safe_load(file_stream)
 
 		# catch a yaml related error to inform user of problem with config file
-		except FileNotFoundError:
+		except FileNotFoundError as e:
 			logging.error("YAML file at {} couldn't be decoded.".format(file_stream))
-			raise FileNotFoundError("YAML file at {} couldn't be decoded.".format(file_stream))
+			raise e
 
-		except PermissionError:
+		except PermissionError as e:
 			logging.error("Can not access {}, permission denied.".format(file_stream))
-			raise PermissionError("Can not access {}, permission denied.".format(file_stream))
+			raise e
 
-		except:
-			logging.error("File reading error.")
-			raise "File reading error."
+		except BaseException as e:
+			logging.error(f"{type(e)} : {e.args}")
+			raise e
 
 		return _file
 
