@@ -1,10 +1,62 @@
-include:
-  - infra.yaml
 services:
-  app:
-    build: .
+
+  neo4j:
+    image: "neo4j:enterprise-ubi9"
+    hostname: neo4j
+    container_name: neo4j
+    volumes:
+      - db-plugin:/plugins
+      - output-files:/import
+    environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_AUTH_FILE=/run/secrets/neo4j_auth_file
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_import_file_use__neo4j__config=true
+      - NEO4J_PLUGINS=["apoc"]
     ports:
       - "7474:7474"
       - "7687:7687"
+    restart: always
+    healthcheck:
+      test: [ "CMD", "neo4j", "status" ]
+      interval: 1m30s
+      start_interval: 30s
+      start_period: 30s
+      timeout: 10s
+      retries: 5
+    secrets:
+      - neo4j_auth_file
+    networks:
+      - db
+
+  app:
+    build:
+      dockerfile: app.dockerfile
+      context: .
+    hostname: app
+    container_name: app
     environment:
       - NEO4J_AUTH_FILE=/run/secrets/neo4j_auth_file
+      - NEO4J_URI=neo4j://neo4j
+    volumes:
+      - output-files:/src/data/output/done/graph
+    secrets:
+      - neo4j_auth_file
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    networks:
+      - db
+
+secrets:
+  neo4j_auth_file:
+    file: "./neo4j_auth_dev.txt"
+
+networks:
+  db:
+    driver: bridge
+
+volumes:
+  db-plugin:
+  output-files:
