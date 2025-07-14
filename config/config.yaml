@@ -1,0 +1,32 @@
+execution_environment:
+   local:
+          encoding: "utf-8-sig"
+          data_origin: 'csv'
+          data_directory_path:
+              base_path: data
+              data:
+                  input:
+                      base_path: input
+                      directories:
+                            - inbound
+                            - work
+                  output:
+                      base_path: output
+                      directories:
+                            - error
+                            - done
+                      results:
+                        - graph
+                        - processed_data
+                  file_type:
+                    - type: clinical_trials
+                      file_regex: "^clinical_trials[.](?P<ext>csv|json)$"
+                    - type: drugs
+                      file_regex: "^drugs[.](?P<ext>csv|json)$"
+                    - type: pubmed
+                      file_regex: "^pubmed[.](?P<ext>csv|json)$"
+              config:
+                  directories:
+                      config: config
+                  files:
+                      logger_config: logger_config.yaml
