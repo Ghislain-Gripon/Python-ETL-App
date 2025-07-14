@@ -3,6 +3,12 @@
 ![graph](complete_graph.png)
 
 
+**_Addendum_** : L'accès à la DB est paramétré par le fichier neo4j_auth_dev.txt à la racine du projet dans le 
+contexte d'un environnement de test.  
+Un tel fichier dans un contexte de production se trouverait dans un outil de gestion de secret.  
+Les informations importantes pour chaque environnement seraient stockées dans un utilitaire de CI/CD et de secrets.  
+Elles seraient ensuite injectées dans le docker-compose via un fichier ``.env`` contenant des placeholders.
+
 ## 4. Traitement ad-hoc (Bonus)
 
 #### 1.
@@ -72,11 +78,13 @@ d1.name peut être paramétrisé comme dans la fonction de Neo4jDBServer pour pe
 n'importe quel médicament.
 
 ```
-MATCH (j:Journal)-[:MENTION]->(d1:Drugs) WHERE d1.name = "TETRACYCLINE"  
+MATCH (j:Journal)-[:MENTION]->(d1:Drugs) WHERE d1.name = $drug  
 MATCH (j)-[:MENTION]->(d:Drugs)-[:REFERENCE]->(:Pubmed) 
 WHERE NOT (d)-[:REFERENCE]->(:Clinical_Trials) AND d.name <> d1.name  
 WITH d.name as Name  
 RETURN DISTINCT Name  
+
+drug="TETRACYCLINE"
 ```
 
 | Name      |
@@ -85,10 +93,10 @@ RETURN DISTINCT Name
 
 **_Explications_** :
 
-``MATCH (j:Journal)-[:MENTION]->(d1:Drugs) WHERE d1.name = "TETRACYCLINE"``
+``MATCH (j:Journal)-[:MENTION]->(d1:Drugs) WHERE d1.name = $drug``
 
 Matche toutes les relations entre MENTION entre un nœud Journal et un nœud Drugs  
-quand le nœud Drugs a la propriété name égale à "TETRACYCLINE"  
+quand le nœud Drugs a la propriété name égale au contenu de la variable `drug`, `"TETRACYCLINE"` pour l'exemple  
 assigne les nœuds Journal à la variable `j` et les nœuds Drugs à `d1`
 
 ``MATCH (j)-[:MENTION]->(d:Drugs)-[:REFERENCE]->(:Pubmed)``
