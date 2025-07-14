@@ -133,6 +133,7 @@ via docker ou kubernetes afin de pouvoir traiter un grand nombre de fichiers en 
 Je modifierais le code pour que l'application se comporte comme une api qui reçoit un nom de fichier et le traite.  
 Pour cela, il faut faire en sorte que l'application prenne en entrée un nom de fichier, en mettant en place une 
 logique de scaling via kubernetes.  
+
 Il serait possible de produire un flux de notification pour chaque nouveau 
 fichier arrivant dans un répertoire ou bucket.  
 Le scaling pourrait ensuite se faire selon le nombre de notifications et la vitesse de réponse des applications 
@@ -142,3 +143,43 @@ Pour permettre de conserver des instances uniques de chaque classe utilitaire sa
 chaque traitement.  
 Il faut sortir de leurs variables de classe tout ce qui est spécifique à un fichier en
 particulier et ne fournir que des méthodes qui prennent les données à traiter en entrée en plus des autres paramètres.
+
+# II) SQL
+
+### _2. Première partie du test_
+
+Selon le dialecte PostgreSQL
+
+```
+SELECT
+  commandes."date" AS "date",
+  SUM(commandes.prod_qty * commandes.prod_price) AS ventes
+FROM
+   "TRANSACTION" commandes
+WHERE
+  TO_DATE(commandes."date", 'DD-MM-YYYY') BETWEEN '2019-01-01' AND '2019-12-31'
+GROUP BY
+  commandes."date"
+ORDER BY
+  commandes."date" DESC
+```
+
+Le mot ``date`` est un mot clé réservé dans la plupart des dialectes SQL, j'ai choisi la norme ISO pour l'échapper 
+avec les guillemets "date" en nom de colonne.  
+Pour ``commandes."date"``, la table du pdf donne un format jour-mois-année, l'inverse du format natif PostgreSQL.
+
+### _3. Seconde partie du test_
+
+````
+SELECT
+  commandes.client_id AS identifiant_client,
+  SUM(CASE WHEN produit.product_type = 'MEUBLE' THEN commandes.prod_qty * commandes.prod_price ELSE 0) AS ventes_meuble,
+  SUM(CASE WHEN produit.product_type = 'DECO' THEN commandes.prod_qty * commandes.prod_price ELSE 0) AS ventes_deco
+FROM
+   "TRANSACTION" commandes
+    JOIN PRODUCT_NOMENCLATURE produit
+    ON commandes.prod_id = produit.product_id
+WHERE
+  TO_DATE(commandes."date", 'DD-MM-YYYY') BETWEEN '2019-01-01' AND '2019-12-31'
+GROUP BY commandes.client_id
+````
