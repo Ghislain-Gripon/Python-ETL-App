@@ -7,7 +7,7 @@
 
 #### 1.
 
-***Question***:  
+***Question*** :  
 Extraire le nom du journal qui mentionne le plus de médicaments différents.
 
 <br>

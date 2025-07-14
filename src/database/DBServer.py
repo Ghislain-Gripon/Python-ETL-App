@@ -1,6 +1,7 @@
+from abc import abstractmethod
 from typing import LiteralString
 
-from src.file_system.FolderStructure import FolderStructure
+from file_system.FolderStructure import FolderStructure
 
 
 class DBServer:
@@ -8,7 +9,9 @@ class DBServer:
 	def __init__(self, _file_handler: FolderStructure):
 		self.file_handler: FolderStructure = _file_handler
 
-	def query(self, query: LiteralString, **kwargs):
+	@classmethod
+	@abstractmethod
+	def query(cls, query: LiteralString, **kwargs):
 		pass
 
 	def __enter__(self):
